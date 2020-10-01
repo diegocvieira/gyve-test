@@ -8,44 +8,36 @@ class OrderRepository implements OrderRepositoryInterface
 {
     public function create($data)
     {
-        Order::create($data);
+        return Order::create($data);
     }
 
-    public function allPaginatedByUser($userId, $pages)
+    public function allPaginated($userId, $pages)
     {
-        $orders = Order::where('user_id', $userId)
+        return Order::where('user_id', $userId)
             ->orderByDesc('created_at')
             ->paginate($pages);
-
-        return $orders;
     }
 
     public function updateState($orderId, $userId, $orderState)
     {
-        $order = Order::where('user_id', $userId)
+        return Order::where('user_id', $userId)
             ->where('id', $orderId)
             ->update([
                 'state' => $orderState
             ]);
-
-        return $order;
     }
 
     public function findByIdAndUser($orderId, $userId)
     {
-        $order = Order::where('user_id', $userId)
+        return Order::where('user_id', $userId)
             ->where('id', $orderId)
             ->first();
-
-        return $order;
     }
 
-    public function searchWithFiltersPaginated($request, $pages)
+    public function searchPaginated($request, $pages)
     {
-        $orders = Order::filterState($request->state)
+        return Order::filterState($request->state)
             ->filterControlNumber($request->control_number)
             ->paginate($pages);
-
-        return $orders;
     }
 }

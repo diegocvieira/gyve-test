@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Repositories\Order\OrderRepositoryInterface;
-use Session;
 use Auth;
 
 class OrderController extends Controller
@@ -23,25 +22,19 @@ class OrderController extends Controller
 
     public function store()
     {
-        $userId = Auth::user()->id;
-        $state = 1;
-        $controlNumber = round(microtime(true));
-
         $data = [
-            'user_id' => $userId,
-            'control_number' => $controlNumber,
-            'state' => $state
+            'user_id' => Auth::user()->id,
+            'control_number' => round(microtime(true)),
+            'state' => 1
         ];
 
         try {
             $this->orderRepository->create($data);
-
-            Session::flash('error_message', 'Order successfully created');
         } catch (\Throwable $th) {
-            Session::flash('error_message', $th->getMessage());
+            return redirect()->back()->withErrors($th->getMessage());
         }
 
-        return redirect()->route('home');
+        return redirect()->back()->withSuccess('Order successfully created');
     }
 
     public function updateState(Request $request)
@@ -54,18 +47,15 @@ class OrderController extends Controller
             $order = $this->orderRepository->findByIdAndUser($orderId, $userId);
 
             if (!$order || !$order->nextStateIsValid($orderState)) {
-                Session::flash('error_message', 'State not changed');
-                return redirect()->route('home');
+                return redirect()->back()->withErrors('State not changed');
             }
 
             $this->orderRepository->updateState($orderId, $userId, $orderState);
-
-            Session::flash('error_message', 'State successfully changed');
         } catch (\Throwable $th) {
-            Session::flash('error_message', $th->getMessage());
+            return redirect()->back()->withErrors($th->getMessage());
         }
 
-        return redirect()->back();
+        return redirect()->back()->withSuccess('State successfully changed');
     }
 
     public function search(Request $request)
@@ -74,7 +64,7 @@ class OrderController extends Controller
         $state = $request->state;
         $pages = 10;
 
-        $orders = $this->orderRepository->searchWithFiltersPaginated($request, $pages);
+        $orders = $this->orderRepository->searchPaginated($request, $pages);
 
         return view('home', compact('orders', 'state', 'controlNumber'));
     }
