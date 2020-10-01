@@ -15,11 +15,6 @@ class OrderController extends Controller
         $this->orderRepository = $orderRepository;
     }
 
-    public function create()
-    {
-        return view('order.create');
-    }
-
     public function store()
     {
         $data = [
