@@ -46,7 +46,7 @@
         </form>
     </div>
 
-    @if ($orders)
+    @if ($orders->count())
         <table class="striped highlight responsive-table">
             <thead>
                 <tr>
