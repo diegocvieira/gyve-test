@@ -8,26 +8,12 @@ class UserRepository implements UserRepositoryInterface
 {
     public function create($data)
     {
-        $data['password'] = bcrypt($data['password']);
-
-        $user = User::create($data);
-
-        return $user;
+        return User::create($data);
     }
 
     public function update($userId, $data)
     {
-        $user = $this->findById($userId);
-
-        if ($data['password']) {
-            $data['password'] = bcrypt($data['password']);
-        } else {
-            unset($data['password']);
-        }
-
-        $user->update($data);
-
-        return $user;
+        return $this->findById($userId)->update($data);
     }
 
     public function allPaginated($pages)

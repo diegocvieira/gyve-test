@@ -45,7 +45,10 @@ class UserController extends Controller
     public function store(UserRequest $request)
     {
         try {
-            $this->userRepository->create($request->all());
+            $data = $request->all();
+            $data['password'] = bcrypt($data['password']);
+
+            $this->userRepository->create($data);
         } catch (\Throwable $th) {
             return redirect()->route('user.index')->withErrors($th->getMessage());
         }
@@ -67,6 +70,12 @@ class UserController extends Controller
         try {
             $userId = Auth::user()->id;
             $data = $request->all();
+
+            if ($data['password']) {
+                $data['password'] = bcrypt($data['password']);
+            } else {
+                unset($data['password']);
+            }
 
             $this->userRepository->update($userId, $data);
         } catch (\Throwable $th) {
