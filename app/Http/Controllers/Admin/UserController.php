@@ -71,7 +71,7 @@ class UserController extends Controller
             $userId = Auth::user()->id;
             $data = $request->all();
 
-            if ($data['password']) {
+            if (isset($data['password']) && $data['password']) {
                 $data['password'] = bcrypt($data['password']);
             } else {
                 unset($data['password']);
