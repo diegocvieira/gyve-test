@@ -91,7 +91,7 @@ class OrderTest extends TestCase
             'password' => $password,
         ]);
 
-        $response = $this->from(route('home'))->get(route('order.search'), ['state' => 1]);
+        $response = $this->get(route('order.search'), ['state' => 1]);
 
         $this->assertAuthenticatedAs($user);
         $response->assertStatus(200);
