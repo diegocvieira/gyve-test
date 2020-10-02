@@ -19,16 +19,10 @@ class OrderTest extends TestCase
             'password' => bcrypt($password = 'password')
         ]);
 
-        $this->post(route('user.login'), [
-            'email' => $user->email,
-            'password' => $password,
-        ]);
-
-        $response = $this->get(route('home'));
-
-        $this->assertAuthenticatedAs($user);
-        $response->assertStatus(200);
-        $response->assertViewIs('home');
+        $this->actingAs($user)
+            ->get(route('home'))
+            ->assertStatus(200)
+            ->assertViewIs('home');
     }
 
     public function testCreateNewOrder()
@@ -37,16 +31,11 @@ class OrderTest extends TestCase
             'password' => bcrypt($password = 'password')
         ]);
 
-        $this->post(route('user.login'), [
-            'email' => $user->email,
-            'password' => $password,
-        ]);
-
-        $response = $this->from(route('home'))->post(route('order.store'));
-
-        $this->assertAuthenticatedAs($user);
-        $response->assertSessionHas('success');
-        $response->assertRedirect(route('home'));
+        $this->actingAs($user)
+            ->from(route('home'))
+            ->post(route('order.store'))
+            ->assertSessionHas('success')
+            ->assertRedirect(route('home'));
     }
 
     public function testChangeOrderState()
@@ -57,13 +46,6 @@ class OrderTest extends TestCase
             'password' => bcrypt($password = 'password')
         ]);
 
-        $this->post(route('user.login'), [
-            'email' => $user->email,
-            'password' => $password,
-        ]);
-
-        $this->from(route('home'))->post(route('order.store'));
-
         $order = Order::create([
             'user_id' => $user->id,
             'control_number' => rand(99999, 99999)
@@ -71,30 +53,22 @@ class OrderTest extends TestCase
 
         $data = ['order_id' => $order->id, 'state' => 2];
 
-        $response = $this->from(route('home'))->put(route('order.update.state'), $data);
-
-        $this->assertAuthenticatedAs($user);
-        $response->assertSessionHas('success');
-        $response->assertRedirect(route('home'));
+        $this->actingAs($user)
+            ->from(route('home'))
+            ->put(route('order.update.state'), $data)
+            ->assertSessionHas('success')
+            ->assertRedirect(route('home'));
     }
 
     public function testOrderSearch()
     {
-        // $this->withoutExceptionHandling();
-
         $user = User::factory()->create([
             'password' => bcrypt($password = 'password')
         ]);
 
-        $this->post(route('user.login'), [
-            'email' => $user->email,
-            'password' => $password,
-        ]);
-
-        $response = $this->get(route('order.search'), ['state' => 1]);
-
-        $this->assertAuthenticatedAs($user);
-        $response->assertStatus(200);
-        $response->assertViewIs('home');
+        $this->actingAs($user)
+            ->get(route('order.search'), ['state' => 1])
+            ->assertStatus(200)
+            ->assertViewIs('home');
     }
 }

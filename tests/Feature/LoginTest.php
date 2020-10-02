@@ -14,19 +14,18 @@ class LoginTest extends TestCase
 
     public function testUserCanViewLoginPage()
     {
-        $response = $this->get(route('user.login'));
-
-        $response->assertStatus(200);
-        $response->assertViewIs('user.login');
+        $this->get(route('user.login'))
+            ->assertStatus(200)
+            ->assertViewIs('user.login');
     }
 
     public function testUserCannotViewLoginPageWhenAuthenticated()
     {
         $user = User::factory()->make();
 
-        $response = $this->actingAs($user)->get(route('user.login'));
-
-        $response->assertRedirect(route('home'));
+        $this->actingAs($user)
+            ->get(route('user.login'))
+            ->assertRedirect(route('home'));
     }
 
     public function testUserCanLoginWithValidCredentials()
@@ -35,12 +34,13 @@ class LoginTest extends TestCase
             'password' => bcrypt($password = 'userpass123'),
         ]);
 
-        $response = $this->post(route('user.login'), [
+        $data = [
             'email' => $user->email,
-            'password' => $password,
-        ]);
+            'password' => $password
+        ];
 
-        $response->assertRedirect(route('home'));
+        $this->post(route('user.login'), $data)
+            ->assertRedirect(route('home'));
 
         $this->assertAuthenticatedAs($user);
     }
@@ -51,13 +51,15 @@ class LoginTest extends TestCase
             'password' => bcrypt($password = 'userpass123'),
         ]);
 
-        $response = $this->from(route('user.login'))->post(route('user.login'), [
+        $data = [
             'email' => $user->email,
-            'password' => 'invalid-password',
-        ]);
+            'password' => 'invalid-password'
+        ];
 
-        $response->assertRedirect(route('user.login'));
-        $response->assertSessionHasErrors();
+        $this->from(route('user.login'))
+            ->post(route('user.login'), $data)
+            ->assertRedirect(route('user.login'))
+            ->assertSessionHasErrors();
 
         $this->assertTrue(session()->hasOldInput('email'));
         $this->assertFalse(session()->hasOldInput('password'));
