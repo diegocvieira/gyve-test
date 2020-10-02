@@ -23,10 +23,10 @@ class UserRequest extends FormRequest
         $userId = Auth::user()->id;
         $user = $this->userRepository->findById($userId);
 
-        if ($user->is_admin) {
+        if ($user->is_admin || $this->method() == 'PUT') {
             return true;
         } else {
-            return fase;
+            return false;
         }
     }
 
