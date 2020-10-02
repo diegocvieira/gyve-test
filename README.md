@@ -59,6 +59,12 @@ $ php artisan serve
 
 After all the steps done, the project can be accessed. As it is a test, the Administrator's credentials are login `admin@admin.com` and password `admin`.
 
+## Testing
+
+```php
+$ php artisan test
+```
+
 ## Stack
 
 * [Laravel](https://laravel.com/) 8.0
