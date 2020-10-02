@@ -60,6 +60,26 @@ class OrderTest extends TestCase
             ->assertRedirect(route('home'));
     }
 
+    public function testOrderCannotChangeStateWithInvalidState()
+    {
+        $user = User::factory()->create([
+            'password' => bcrypt($password = 'password')
+        ]);
+
+        $order = Order::create([
+            'user_id' => $user->id,
+            'control_number' => rand(99999, 99999)
+        ]);
+
+        $data = ['order_id' => $order->id, 'state' => 3];
+
+        $this->actingAs($user)
+            ->from(route('home'))
+            ->put(route('order.update.state'), $data)
+            ->assertSessionHasErrors()
+            ->assertRedirect(route('home'));
+    }
+
     public function testOrderSearch()
     {
         $user = User::factory()->create([
